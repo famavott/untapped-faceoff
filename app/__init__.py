@@ -1,0 +1,6 @@
+"""Init for app package to create app object."""
+from flask import Flask
+
+app = Flask(__name__)
+
+from app import routes
