@@ -49,16 +49,19 @@ def user_badges(username):
 
 def user_beers(username):
     """Get beer information for user and return data."""
+    offset = 0
+    all_beers = {}
     while True:
-        endpoint = 'user/beers/{}?limit=50&client_id={}&client_secret={}'.format(username,
-                                                                                 CLIENT_ID,
-                                                                                 CLIENT_KEY)
+        endpoint = 'user/beers/{}?limit=50&offset={}&client_id={}&client_secret={}'.format(username,
+                                                                                           offset,
+                                                                                           CLIENT_ID,
+                                                                                           CLIENT_KEY)
         r = requests.get(BASE_QUERY + endpoint)
         response = r.json()
 
-        all_beers = {}
         for item in response['response']['beers']['items']:
             all_beers.setdefault(item['beer']['bid'], item)
         if len(response['response']['beers']['items']) < 50:
             break
-    return len(all_beers)
+        offset += 50
+    return all_beers
