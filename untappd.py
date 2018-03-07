@@ -6,9 +6,9 @@ BASE_QUERY = 'https://api.untappd.com/v4/'
 
 def user_info(username):
     """Get basic bio information about user and return data."""
-    endpoint = 'user/info/{}?compact=true&client_id={}&client_secret={}'.format(username,
-                                                                                CLIENT_ID,
-                                                                                CLIENT_KEY)
+    endpoint = 'user/info/{}?client_id={}&client_secret={}'.format(username,
+                                                                   CLIENT_ID,
+                                                                   CLIENT_KEY)
     r = requests.get(BASE_QUERY + endpoint)
     response = r.json()
 
@@ -19,11 +19,15 @@ def user_info(username):
     beers = base_resp['stats']['total_beers']
     checkins = base_resp['stats']['total_checkins']
     friends = base_resp['stats']['total_friends']
+    for item in base_resp['checkins']['items']:
+        if item['venue'] != []:
+            recent_venue = item['venue']['venue_name']
     return {'username': username,
             'location': location,
             'total_beers': beers,
             'total_checkins': checkins,
-            'friends': friends
+            'friends': friends,
+            'recent_venue': recent_venue
             }
 
 
@@ -45,12 +49,16 @@ def user_badges(username):
 
 def user_beers(username):
     """Get beer information for user and return data."""
-    endpoint = 'user/beers/{}?compact=true&client_id={}&client_secret={}'.format(username,
+    while True:
+        endpoint = 'user/beers/{}?limit=50&client_id={}&client_secret={}'.format(username,
                                                                                  CLIENT_ID,
                                                                                  CLIENT_KEY)
-    r = requests.get(BASE_QUERY + endpoint)
-    response = r.json()
+        r = requests.get(BASE_QUERY + endpoint)
+        response = r.json()
 
-    base_resp = response['response']['beers']['items']
-    recent_beer_name = base_resp[0]['beer']['beer_name'] + ' ' + base_resp[0]['brewery']['brewery_name']
-    return recent_beer_name
+        all_beers = {}
+        for item in response['response']['beers']['items']:
+            all_beers.setdefault(item['beer']['bid'], item)
+        if len(response['response']['beers']['items']) < 50:
+            break
+    return len(all_beers)
