@@ -1,4 +1,4 @@
-"""Module to call Untappd API and return data for user."""
+"""Module with functions to call Untappd API and return data for user."""
 import requests
 
 BASE_QUERY = 'https://api.untappd.com/v4/'
@@ -48,7 +48,7 @@ def user_badges(username):
 
 
 def user_beers(username):
-    """Get beer information for user and return data."""
+    """Get unique beer information for user and return data."""
     offset = 0
     all_beers = {}
     while True:
