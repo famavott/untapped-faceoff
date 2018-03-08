@@ -25,15 +25,11 @@ def user_info(username):
     beers = base_resp['stats']['total_beers']
     checkins = base_resp['stats']['total_checkins']
     friends = base_resp['stats']['total_friends']
-    for item in base_resp['checkins']['items']:
-        if item['venue'] != []:
-            recent_venue = item['venue']['venue_name']
     return {'username': username,
             'location': location,
             'total_beers': beers,
             'total_checkins': checkins,
             'friends': friends,
-            'recent_venue': recent_venue
             }
 
 
