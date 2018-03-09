@@ -25,11 +25,13 @@ def user_info(username):
     beers = base_resp['stats']['total_beers']
     checkins = base_resp['stats']['total_checkins']
     friends = base_resp['stats']['total_friends']
+    avatar = base_resp['user_avatar']
     return {'username': username,
             'location': location,
             'total_beers': beers,
             'total_checkins': checkins,
             'friends': friends,
+            'avatar': avatar,
             }
 
 
