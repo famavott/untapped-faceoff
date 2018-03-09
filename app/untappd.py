@@ -1,14 +1,20 @@
 """Module with functions to call Untappd API and return data for user."""
+import os
+
 import requests
 
 BASE_QUERY = 'https://api.untappd.com/v4/'
+
+KEY = os.environ.get('CLIENT_KEY')
+
+ID = os.environ.get('CLIENT_ID')
 
 
 def user_info(username):
     """Get basic bio information about user and return data."""
     endpoint = 'user/info/{}?client_id={}&client_secret={}'.format(username,
-                                                                   CLIENT_ID,
-                                                                   CLIENT_KEY)
+                                                                   ID,
+                                                                   KEY)
     r = requests.get(BASE_QUERY + endpoint)
     response = r.json()
 
@@ -19,23 +25,21 @@ def user_info(username):
     beers = base_resp['stats']['total_beers']
     checkins = base_resp['stats']['total_checkins']
     friends = base_resp['stats']['total_friends']
-    for item in base_resp['checkins']['items']:
-        if item['venue'] != []:
-            recent_venue = item['venue']['venue_name']
+    avatar = base_resp['user_avatar']
     return {'username': username,
             'location': location,
             'total_beers': beers,
             'total_checkins': checkins,
             'friends': friends,
-            'recent_venue': recent_venue
+            'avatar': avatar,
             }
 
 
 def user_badges(username):
     """Get badge information for user and return data."""
     endpoint = 'user/badges/{}?compact=true&client_id={}&client_secret={}'.format(username,
-                                                                                  CLIENT_ID,
-                                                                                  CLIENT_KEY)
+                                                                                  ID,
+                                                                                  KEY)
     r = requests.get(BASE_QUERY + endpoint)
     response = r.json()
 
@@ -54,8 +58,8 @@ def user_beers(username):
     while True:
         endpoint = 'user/beers/{}?limit=50&offset={}&client_id={}&client_secret={}'.format(username,
                                                                                            offset,
-                                                                                           CLIENT_ID,
-                                                                                           CLIENT_KEY)
+                                                                                           ID,
+                                                                                           KEY)
         r = requests.get(BASE_QUERY + endpoint)
         response = r.json()
 
