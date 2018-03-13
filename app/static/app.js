@@ -33,7 +33,9 @@ function getAllBeers(username) {
           console.log(response)
           $('.graph-area').removeClass('hidden')
           getRatingData(response)
-          timeChart.update()
+          ratingChart.update()
+          getDayData(response)
+          dayChart.update()
         },
         error: function(error) {
             console.log(error)
@@ -93,6 +95,8 @@ function renderBasicInfo() {
 
 const beer_ratings = []
 const ratings_count = []
+const colors = []
+const borderColors = []
 
 function getRatingData(response) {
   let ratings = []
@@ -108,20 +112,107 @@ function getRatingData(response) {
     }
   }
   for(let [key, value] of Object.entries(counts)) {
-    beer_ratings.push(parseInt(key))
+    beer_ratings.push(parseFloat(key))
     ratings_count.push(value)
   }
-  console.log(beer_ratings)
-  console.log(ratings_count)
+  for(let i = 0; i < ratings_count.length; i++) {
+    let color = `rgba(${randomColorFactor()}, ${randomColorFactor()}, ${randomColorFactor()}, 0.4)`
+    colors.push(color)
+    borderColors.push(color)
+  }
+  console.log(getRatingAverage(ratings))
+};
+
+function getRatingAverage(allRatings) {
+  let sum = 0
+  for(var i =0; i < allRatings.length; i++) {
+    sum += allRatings[i]
+  }
+  return Math.round((sum/allRatings.length) * 100) / 100
 };
 
 const beer_styles = []
 const styles_count = []
 
-function getStyleData(response) {
+let ctx = $("#rating-graph");
+let ratingChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: beer_ratings,
+        datasets: [{
+            label: '# of Reviews by Rating',
+            data: ratings_count,
+            backgroundColor: colors,
+            borderColor: borderColors,
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
+
+const week_days = []
+const days_count = []
+
+function getDayData(response) {
+  let dayStr = []
+  let counts = {
+                "Mon": 0,
+                "Tue": 0,
+                "Wed": 0,
+                "Thu": 0,
+                "Fri": 0,
+                "Sat": 0,
+                "Sun": 0
+  }
+
+  for (let item in response) {
+    dayStr.push(response[item].first_created_at.slice(0, 3))
+  }
+  for(let i = 0; i < dayStr.length; i++) {
+    counts[dayStr[i]]++
+  }
+  for(let [key, value] of Object.entries(counts)) {
+    week_days.push(key)
+    days_count.push(value)
+  }
+};
+
+let ctx2 = $("#day-graph");
+let dayChart = new Chart(ctx2, {
+    type: 'bar',
+    data: {
+        labels: week_days,
+        datasets: [{
+            label: 'Check-ins by Day',
+            data: days_count,
+            backgroundColor: colors,
+            borderColor: borderColors,
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
+
+ function getStyleData(response) {
   let styles = []
   let counts = {}
-  for(let item in response){
+  for(let item in response) {
     styles.push(response[item].beer.beer_style)
   }
   for(let i = 0; i < styles.length; i++) {
@@ -142,92 +233,3 @@ function getStyleData(response) {
 let randomColorFactor = function() {
   return (Math.round(Math.random() * 255))
 };
-
-// let ctx = $("#style-graph");
-// let timeChart = new Chart(ctx, {
-//     type: 'pie',
-//     data: {
-//         labels: beer_styles,
-//         datasets: [{
-//             label: 'Beer Styles',
-//             data: styles_count,
-//             backgroundColor: [
-//                 'rgba(255, 99, 132, 0.2)',
-//                 'rgba(54, 162, 235, 0.2)',
-//                 'rgba(255, 206, 86, 0.2)',
-//                 'rgba(75, 192, 192, 0.2)',
-//                 'rgba(153, 102, 255, 0.2)',
-//                 'rgba(255, 159, 64, 0.2)',
-//                 'rgba(200, 68, 67, 0.2)',
-//                 'rgba(155, 170, 80, 0.2)',
-//                 'rgba(23, 42, 64, 0.2)',
-//                 'rgba(110, 200, 34, 0.2)',
-//             ],
-//             borderColor: [
-//                 'rgba(255, 99, 132, 1)',
-//                 'rgba(54, 162, 235, 1)',
-//                 'rgba(255, 206, 86, 1)',
-//                 'rgba(75, 192, 192, 1)',
-//                 'rgba(153, 102, 255, 1)',
-//                 'rgba(255, 159, 64, 1)',
-//                 'rgba(200, 68, 67, 0.2)',
-//                 'rgba(155, 170, 80, 0.2)',
-//                 'rgba(255, 159, 64, 0.2)',
-//                 'rgba(23, 42, 64, 0.2)',
-//                 'rgba(110, 200, 34, 0.2)',
-//             ],
-//             borderWidth: 1
-//         }]
-//     },
-//     options: {
-//         scales: {
-//             yAxes: [{
-//                 ticks: {
-//                     beginAtZero:true
-//                 }
-//             }]
-//         }
-//     }
-// });
-
-let ctx = $("#style-graph");
-let timeChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: beer_ratings,
-        datasets: [{
-            label: '# of Reviews by Rating',
-            data: ratings_count,
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)',
-                'rgba(200, 68, 67, 0.2)',
-                'rgba(155, 170, 80, 0.2)'
-            ],
-            borderColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)',
-                'rgba(200, 68, 67, 0.2)',
-                'rgba(155, 170, 80, 0.2)'
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero:true
-                }
-            }]
-        }
-    }
-});
