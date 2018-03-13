@@ -24,7 +24,7 @@ def user_info_view():
     badge_dict = user_badges(username)
     context.update(info_dict)
     context.update(badge_dict)
-    context['status'] = 'OK'
+    # context['status'] = 'OK'
     return json.dumps(context)
 
 
@@ -33,5 +33,5 @@ def user_beers_view():
     """Return all distinct beers for the current user."""
     username = request.form['username'].strip('"')
     context = user_beers(username)
-    context['status'] = 'OK'
+    # context['status'] = 'OK'
     return json.dumps(context)
