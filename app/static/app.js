@@ -33,9 +33,11 @@ function getAllBeers(username) {
           console.log(response)
           $('.graph-area').removeClass('hidden')
           getRatingData(response)
-          ratingChart.update()
+          getTopBreweries(response)
           getDayData(response)
+          ratingChart.update()
           dayChart.update()
+          breweriesChart.update()
         },
         error: function(error) {
             console.log(error)
@@ -100,16 +102,35 @@ const borderColors = []
 
 function getRatingData(response) {
   let ratings = []
-  let counts = {}
+  let counts = {
+                "0": 0,
+                "0.25": 0,
+                "0.50": 0,
+                "0.75": 0,
+                "1": 0,
+                "1.25": 0,
+                "1.50": 0,
+                "1.75": 0,
+                "2": 0,
+                "2.25": 0,
+                "2.50": 0,
+                "2.75": 0,
+                "3": 0,
+                "3.25": 0,
+                "3.50": 0,
+                "3.75": 0,
+                "4": 0,
+                "4.25": 0,
+                "4.50": 0,
+                "4.75": 0,
+                "5": 0
+  }
+
   for(let item in response) {
     ratings.push(response[item].rating_score)
   }
   for(let i = 0; i < ratings.length; i++) {
-    if(!counts.hasOwnProperty(ratings[i])) {
-      counts[ratings[i]] = 1
-    } else {
-      counts[ratings[i]]++
-    }
+    counts[ratings[i]]++
   }
   for(let [key, value] of Object.entries(counts)) {
     beer_ratings.push(parseFloat(key))
@@ -158,8 +179,56 @@ let ratingChart = new Chart(ctx, {
     }
 });
 
-const week_days = []
-const days_count = []
+const allBreweries = []
+const breweriesCount = []
+
+function getTopBreweries(response) {
+  let breweries = []
+  let counts = {}
+
+  for(let item in response) {
+    breweries.push(response[item].brewery.brewery_name)
+  }
+  for(let i = 0; i < breweries.length; i++) {
+    if (!counts.hasOwnProperty(breweries[i])) {
+      counts[breweries[i]] = 1
+    } else {
+      counts[breweries[i]]++
+    }
+  }
+  for(let [key, value] of Object.entries(counts)) {
+    allBreweries.push(key)
+    breweriesCount.push(value)
+  }
+}
+
+let ctx3 = $("#breweries-graph");
+let breweriesChart = new Chart(ctx3, {
+    type: 'bar',
+    data: {
+        labels: allBreweries,
+        datasets: [{
+            label: 'Beers by Brewery',
+            data: breweriesCount,
+            backgroundColor: colors,
+            borderColor: borderColors,
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
+
+
+const weekDays = []
+const daysCount = []
 
 function getDayData(response) {
   let dayStr = []
@@ -173,15 +242,15 @@ function getDayData(response) {
                 "Sun": 0
   }
 
-  for (let item in response) {
+  for(let item in response) {
     dayStr.push(response[item].first_created_at.slice(0, 3))
   }
   for(let i = 0; i < dayStr.length; i++) {
     counts[dayStr[i]]++
   }
   for(let [key, value] of Object.entries(counts)) {
-    week_days.push(key)
-    days_count.push(value)
+    weekDays.push(key)
+    daysCount.push(value)
   }
 };
 
@@ -189,10 +258,10 @@ let ctx2 = $("#day-graph");
 let dayChart = new Chart(ctx2, {
     type: 'bar',
     data: {
-        labels: week_days,
+        labels: weekDays,
         datasets: [{
             label: 'Check-ins by Day',
-            data: days_count,
+            data: daysCount,
             backgroundColor: colors,
             borderColor: borderColors,
             borderWidth: 1
@@ -233,3 +302,7 @@ let dayChart = new Chart(ctx2, {
 let randomColorFactor = function() {
   return (Math.round(Math.random() * 255))
 };
+
+let d = new Date("Mon, 06 Jul 2015 14:53:58 -0700");
+let dStr = $.datepicker.formatDate('yy-mm-dd', d)
+console.log(dStr)
