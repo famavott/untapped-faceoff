@@ -3,27 +3,67 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
+    <!-- CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css')}}">
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.min.js"></script>
     <title>Untappd Analytics</title>
   </head>
-
-  <body>
-    <h1>Welcome to Untappd Analytics!</h1>
-      <div class="container">
-        <div class="form-group">
-            <input type="username" class="form-control" id="username-search" placeholder="Enter Untappd Username">
+    <!-- Start Nav -->
+    <nav class="navbar navbar-expand-lg">
+       <a class="navbar-brand" href="">Untappd Analytics</a>
+       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+         <span class="navbar-toggler-icon"></span>
+       </button>
+      <div class="collapse navbar-collapse " id="navbarSupportedContent">
+         <ul class="navbar-nav mr-4">
+           <li class="nav-item">
+             <a class="nav-link" href="#">Welcome!</a>
+           </li>
+         </ul>
+      </div>
+    </nav>
+    <!-- Start Body -->
+    <body>
+      <div class="welcome container">
+          <div class="description text-center">
+            <h1>Welcome to Untappd Analytics!</h1>
+            <h4>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolores odio unde explicabo officiis qui accusantium. Consectetur animi praesentium ad itaque.</h4>
+            <div class="container form-group">
+              <div class="row justify-content-center">
+                <div class="col-6">
+                  <input type="username" class="form-control" id="username-search" placeholder="Enter Untappd Username">
+                </div>
+              </div>
+            </div>
+            <button id="main-btn" type="button" class="btn btn-warning btn-lg">Submit</button>
+          </div>
+      </div>
+      <!-- User Info -->
+      <div id="user-card">
+      </div>
+      <!-- Graphs -->
+      <div class="row">
+        <div class="container col-6 graph-area hidden" width="200" height="200">
+          <canvas id="rating-graph"></canvas>
         </div>
-        <button id="main-btn" type="button" class="btn btn-primary">Submit</button>
-        <div id="user-card">
+        <div class="container col-6 graph-area hidden" width="200" height="200">
+          <canvas id="day-graph"></canvas>
+        </div>
+      </div>
+      <div class="row">
+        <div class="container col-6 graph-area hidden" width="200" height="200">
+          <canvas id="breweries-graph"></canvas>
         </div>
       </div>
 
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <script src="{{url_for('static', filename='app.js')}}"></script>
-  </body>
+      <!-- jQuery, jQuery UI, Popper.js, then Bootstrap JS -->
+      <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+      <script src='https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js'></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+      <script src="{{url_for('static', filename='app.js')}}"></script>
+    </body>
 </html>

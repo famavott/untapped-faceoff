@@ -10,7 +10,9 @@ $(document).ready(function() {
             dataType: 'json',
             data: {'username': JSON.stringify(username)},
             success: function(response) {
+                console.log(response)
                 localStorage.setItem('userinfo', JSON.stringify(response))
+                $('.welcome').hide()
                 renderBasicInfo()
                 getAllBeers(username)
             },
@@ -28,14 +30,20 @@ function getAllBeers(username) {
         dataType: 'json',
         data: {'username': JSON.stringify(username)},
         success: function(response) {
-            console.log('The beers are here')
-            console.log(response)
+          console.log(response)
+          $('.graph-area').removeClass('hidden')
+          getRatingData(response)
+          getTopBreweries(response)
+          getDayData(response)
+          ratingChart.update()
+          dayChart.update()
+          breweriesChart.update()
         },
         error: function(error) {
             console.log(error)
         }
     })
-}
+};
 
 function renderBasicInfo() {
     let userinfo = JSON.parse(localStorage['userinfo'])
@@ -81,5 +89,220 @@ function renderBasicInfo() {
             </tbody>
           </table>`
 
+    let welcome = `<a class="nav-link" href="#">Welcome, ${username}!</a>`
+    $('.nav-link').hide()
+    $('.nav-item').html(welcome)
     $('#user-card').html(table)
 };
+
+const beer_ratings = []
+const ratings_count = []
+const colors = []
+const borderColors = []
+
+function getRatingData(response) {
+  let ratings = []
+  let counts = {
+                "0": 0,
+                "0.25": 0,
+                "0.50": 0,
+                "0.75": 0,
+                "1": 0,
+                "1.25": 0,
+                "1.50": 0,
+                "1.75": 0,
+                "2": 0,
+                "2.25": 0,
+                "2.50": 0,
+                "2.75": 0,
+                "3": 0,
+                "3.25": 0,
+                "3.50": 0,
+                "3.75": 0,
+                "4": 0,
+                "4.25": 0,
+                "4.50": 0,
+                "4.75": 0,
+                "5": 0
+  }
+
+  for(let item in response) {
+    ratings.push(response[item].rating_score)
+  }
+  for(let i = 0; i < ratings.length; i++) {
+    counts[ratings[i]]++
+  }
+  for(let [key, value] of Object.entries(counts)) {
+    beer_ratings.push(parseFloat(key))
+    ratings_count.push(value)
+  }
+  for(let i = 0; i < ratings_count.length; i++) {
+    let color = `rgba(${randomColorFactor()}, ${randomColorFactor()}, ${randomColorFactor()}, 0.4)`
+    colors.push(color)
+    borderColors.push(color)
+  }
+  console.log(getRatingAverage(ratings))
+};
+
+function getRatingAverage(allRatings) {
+  let sum = 0
+  for(var i =0; i < allRatings.length; i++) {
+    sum += allRatings[i]
+  }
+  return Math.round((sum/allRatings.length) * 100) / 100
+};
+
+const beer_styles = []
+const styles_count = []
+
+let ctx = $("#rating-graph");
+let ratingChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: beer_ratings,
+        datasets: [{
+            label: '# of Reviews by Rating',
+            data: ratings_count,
+            backgroundColor: colors,
+            borderColor: borderColors,
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
+
+const allBreweries = []
+const breweriesCount = []
+
+function getTopBreweries(response) {
+  let breweries = []
+  let counts = {}
+
+  for(let item in response) {
+    breweries.push(response[item].brewery.brewery_name)
+  }
+  for(let i = 0; i < breweries.length; i++) {
+    if (!counts.hasOwnProperty(breweries[i])) {
+      counts[breweries[i]] = 1
+    } else {
+      counts[breweries[i]]++
+    }
+  }
+  for(let [key, value] of Object.entries(counts)) {
+    allBreweries.push(key)
+    breweriesCount.push(value)
+  }
+}
+
+let ctx3 = $("#breweries-graph");
+let breweriesChart = new Chart(ctx3, {
+    type: 'bar',
+    data: {
+        labels: allBreweries,
+        datasets: [{
+            label: 'Beers by Brewery',
+            data: breweriesCount,
+            backgroundColor: colors,
+            borderColor: borderColors,
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
+
+
+const weekDays = []
+const daysCount = []
+
+function getDayData(response) {
+  let dayStr = []
+  let counts = {
+                "Mon": 0,
+                "Tue": 0,
+                "Wed": 0,
+                "Thu": 0,
+                "Fri": 0,
+                "Sat": 0,
+                "Sun": 0
+  }
+
+  for(let item in response) {
+    dayStr.push(response[item].first_created_at.slice(0, 3))
+  }
+  for(let i = 0; i < dayStr.length; i++) {
+    counts[dayStr[i]]++
+  }
+  for(let [key, value] of Object.entries(counts)) {
+    weekDays.push(key)
+    daysCount.push(value)
+  }
+};
+
+let ctx2 = $("#day-graph");
+let dayChart = new Chart(ctx2, {
+    type: 'bar',
+    data: {
+        labels: weekDays,
+        datasets: [{
+            label: 'Check-ins by Day',
+            data: daysCount,
+            backgroundColor: colors,
+            borderColor: borderColors,
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
+
+ function getStyleData(response) {
+  let styles = []
+  let counts = {}
+  for(let item in response) {
+    styles.push(response[item].beer.beer_style)
+  }
+  for(let i = 0; i < styles.length; i++) {
+    if (!counts.hasOwnProperty(styles[i])) {
+      counts[styles[i]] = 1
+    } else {
+      counts[styles[i]]++
+    }
+  }
+  for(let [key, value] of Object.entries(counts)) {
+    beer_styles.push(key)
+    styles_count.push(value)
+  }
+  console.log(beer_styles)
+  console.log(styles_count)
+};
+
+let randomColorFactor = function() {
+  return (Math.round(Math.random() * 255))
+};
+
+let d = new Date("Mon, 06 Jul 2015 14:53:58 -0700");
+let dStr = $.datepicker.formatDate('yy-mm-dd', d)
+console.log(dStr)
