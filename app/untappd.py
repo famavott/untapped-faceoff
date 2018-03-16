@@ -65,7 +65,8 @@ def user_beers(username):
 
         for item in response['response']['beers']['items']:
             all_beers.setdefault(item['beer']['bid'], item)
-        if len(response['response']['beers']['items']) < 50:
+        if len(response['response']['beers']['items']) < 50 or len(all_beers) >= 500:
             break
         offset += 50
+        print(len(all_beers))
     return all_beers
