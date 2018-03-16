@@ -169,13 +169,12 @@ let ratingChart = new Chart(ctx, {
         }]
     },
     options: {
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero:true
-                }
-            }]
-        }
+      legend: false,
+      responsive: true,
+      title: {
+        display: true,
+        text: 'Beer Ratings by Score'
+      }
     }
 });
 
@@ -200,6 +199,8 @@ function getTopBreweries(response) {
     allBreweries.push(key)
     breweriesCount.push(value)
   }
+  console.log(allBreweries)
+  console.log(breweriesCount)
 }
 
 let ctx3 = $("#breweries-graph");
@@ -221,8 +222,15 @@ let breweriesChart = new Chart(ctx3, {
                 ticks: {
                     beginAtZero:true
                 }
+            }],
+            xAxes: [{
+                ticks: {
+                    beginAtZero:true,
+                    autoSkip: false,
+                    fontSize: 10,
+                }
             }]
-        }
+        },
     }
 });
 
@@ -260,7 +268,6 @@ let dayChart = new Chart(ctx2, {
     data: {
         labels: weekDays,
         datasets: [{
-            label: 'Check-ins by Day',
             data: daysCount,
             backgroundColor: colors,
             borderColor: borderColors,
@@ -273,10 +280,24 @@ let dayChart = new Chart(ctx2, {
                 ticks: {
                     beginAtZero:true
                 }
+            }],
+            xAxes: [{
+                ticks: {
+                    beginAtZero:true,
+                    autoSkip: false,
+                    fontSize: 10,
+                }
             }]
+        },
+        legend: false,
+        responsive: true,
+        title: {
+          display: true,
+          text: 'Beers by Day of Week'
         }
     }
 });
+
 
  function getStyleData(response) {
   let styles = []
