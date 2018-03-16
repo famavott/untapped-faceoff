@@ -56,7 +56,7 @@ function renderBasicInfo() {
     let badge = userinfo['recent_badge']
     let badgeDate = userinfo['recent_date']
 
-    let table = `<table class="user-table">
+    let table = `<table id="user-table>
             <tbody>
               <tr>
                 <th scope="row">${username}</th>
@@ -161,7 +161,6 @@ let ratingChart = new Chart(ctx, {
     data: {
         labels: beer_ratings,
         datasets: [{
-            label: '# of Reviews by Rating',
             data: ratings_count,
             backgroundColor: colors,
             borderColor: borderColors,
@@ -195,13 +194,18 @@ function getTopBreweries(response) {
       counts[breweries[i]]++
     }
   }
-  for(let [key, value] of Object.entries(counts)) {
-    allBreweries.push(key)
-    breweriesCount.push(value)
+  let sortable = []
+  for(let place in counts) {
+    sortable.push([place, counts[place]])
   }
-  console.log(allBreweries)
-  console.log(breweriesCount)
-}
+  sortable.sort(function(a, b) {
+    return a[1] - b[1]
+  })
+  for(let data in sortable.slice(-10)) {
+    allBreweries.push((sortable.slice(-10)[data][0]))
+    breweriesCount.push((sortable.slice(-10)[data][1]))
+  }
+};
 
 let ctx3 = $("#breweries-graph");
 let breweriesChart = new Chart(ctx3, {
@@ -209,7 +213,6 @@ let breweriesChart = new Chart(ctx3, {
     data: {
         labels: allBreweries,
         datasets: [{
-            label: 'Beers by Brewery',
             data: breweriesCount,
             backgroundColor: colors,
             borderColor: borderColors,
@@ -217,6 +220,7 @@ let breweriesChart = new Chart(ctx3, {
         }]
     },
     options: {
+        legend: false,
         scales: {
             yAxes: [{
                 ticks: {
@@ -231,6 +235,10 @@ let breweriesChart = new Chart(ctx3, {
                 }
             }]
         },
+        title: {
+        display: true,
+        text: 'Top 10 Breweries by Unique Beers'
+      }
     }
 });
 
